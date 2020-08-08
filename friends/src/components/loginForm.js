@@ -27,7 +27,7 @@ class loginForm extends React.Component {
         this.props.history.push("/protected");
       })
       .catch((err) => {
-        console.log("There is an error", err);
+        console.log("There is an error", err.message);
       });
   };
 
