@@ -1,85 +1,38 @@
 import React, { useState, useEffect } from "react";
 import axiosWithAuth from "../utilities/axiosWithAuth";
+import Friends from "./friends";
+import loginForm from "./loginForm";
 
-const friendsList = () => {
-  const initialNewFriend = {
-    name: "",
-    age: "",
-    email: "",
-  };
-
+function friendsList(props) {
   const [friends, setFriends] = useState([]);
-  const [newFriend, setNewFriend] = useState(initialNewFriend);
+
+  const getData = () => {
+    axiosWithAuth()
+      .get(`/friends`)
+      .then((res) => {
+        setFriends(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => console.error(err.message));
+  };
 
   useEffect(() => {
-    axiosWithAuth()
-      .get("/api/friends")
-      .then((res) => {
-        setFriends(res.data);
-      })
-      .catch((err) => {
-        console.log("Error fetching friends", err.message);
-      });
+    getData();
   }, []);
-
-  const handleChanges = (e) => {
-    setNewFriend({
-      ...newFriend,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const addFriend = (e) => {
-    e.preventDefault();
-    axiosWithAuth()
-      .post("/api/friends", newFriend)
-      .then((res) => {
-        setNewFriend(initialNewFriend);
-        setFriends(res.data);
-      })
-      .catch((err) => {
-        console.log("There was an error adding friends", err.message);
-      });
-  };
 
   return (
     <div>
-      <form onSubmit={addFriend}>
-        <input
-          type="text"
-          name="name"
-          value={newFriend.name}
-          onChange={handleChanges}
-          placeholder="Name"
-        />
-        <input
-          type="number"
-          name="age"
-          value={newFriend.age}
-          onChange={handleChanges}
-          placeholder="Age"
-        />
-        <input
-          type="email"
-          name="email"
-          value={newFriend.email}
-          onChange={handleChanges}
-          placeholder="Email"
-        />
-      </form>
-
+      <h1>Friends!</h1>
+      <loginForm />
       <div>
-        <h2>Friends List</h2>
         {friends.map((friend) => (
-          <div key={friend.id}>
-            <p>Name: {friend.name}</p>
-            <p>Age: {friend.age}</p>
-            <p>Email: {friend.email}</p>
+          <div>
+            <Friends name={friend.name} age={friend.age} email={friend.email} />
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
 
 export default friendsList;
